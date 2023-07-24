@@ -1,58 +1,48 @@
 @file:Suppress("UnstableApiUsage")
 
-import java.net.URI
+import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
-    `maven-publish`
-    signing
+    id("com.vanniktech.maven.publish") version "0.25.3"
 }
 
-    publishing {
-        publications {
-            register<MavenPublication>("maven") {
-                groupId = "io.github.nailik"
-                artifactId = "androidresampler"
-                version = "0.1"
 
-                artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.S01)
+    signAllPublications()
+}
 
-                pom {
-                    name = "androidresampler"
-                    packaging = "aar"
-                    description =
-                        "This is a simple Audio Resampler using Oboe Resampler in order to change Channel and SampleRate live."
-                    url = "https://github.com/Nailik/AndroidResampler"
-                    developers {
-                        developer {
-                            id = "Nailik"
-                            name = "Kilian"
-                        }
-                    }
-                    scm {
-                        connection = "scm:git:git://github.com/Nailik/AndroidResampler.git"
-                        developerConnection = "scm:git:ssh://github.com/Nailik/AndroidResampler.git"
-                        url = "https://github.com/Nailik/AndroidResampler"
-                    }
-                }
+mavenPublishing {
+    coordinates("io.github.nailik", "androidresampler", "0.1")
+
+    pom {
+        name.set("androidresampler")
+        description.set("This is a simple Audio Resampler using Oboe Resampler in order to change Channel and SampleRate live.")
+        inceptionYear.set("2023")
+        url.set("https://github.com/Nailik/AndroidResampler")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
-
-        repositories {
-            maven {
-
-                credentials {
-                    username = project.properties["NEXUS_USERNAME"].toString()
-                    password = project.properties["NEXUS_PASSWORD"].toString()
-                }
-
-                name = "io.github.nailik.androidresampler"
-                url = URI("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+        developers {
+            developer {
+                id.set("Nailik")
+                name.set("Nailik")
+                url.set("https://github.com/Nailik/")
             }
-
+        }
+        scm {
+            url.set("https://github.com/Nailik/AndroidResampler/")
+            connection.set("scm:git:git://github.com/Nailik/AndroidResampler.git")
+            developerConnection.set("scm:git:ssh://git@github.com/Nailik/AndroidResampler.git")
         }
     }
+}
 
 android {
     namespace = "io.github.nailik.androidresampler"

@@ -61,11 +61,11 @@ class MainViewModel {
         outputAudioTrack.stop()
         _state.update {
             val configuration = when (event) {
-                is SelectInputChannelType -> it.configuration.copy(audioInputChannelType = event.channelType)
-                is SelectInputSampleRate -> it.configuration.copy(audioInputSampleRateType = event.sampleRate)
+                is SelectInputChannelType  -> it.configuration.copy(audioInputChannelType = event.channelType)
+                is SelectInputSampleRate   -> it.configuration.copy(audioInputSampleRateType = event.sampleRate)
                 is SelectOutputChannelType -> it.configuration.copy(audioOutputChannelType = event.channelType)
-                is SelectOutputSampleRate -> it.configuration.copy(audioOutputSampleRateType = event.sampleRate)
-                is SelectQuality -> it.configuration.copy(quality = event.quality)
+                is SelectOutputSampleRate  -> it.configuration.copy(audioOutputSampleRateType = event.sampleRate)
+                is SelectQuality           -> it.configuration.copy(quality = event.quality)
             }
             it.copy(configuration = configuration)
         }
