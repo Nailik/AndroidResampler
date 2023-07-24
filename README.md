@@ -8,6 +8,10 @@ in order to change Channel and SampleRate.
 
 - Add to dependencies
 
+```
+implementation("io.github.nailik:androidresampler:0.1")
+```
+
 - create the Configuration with input and output settings.
 
 ```
