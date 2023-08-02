@@ -29,8 +29,6 @@ Java_io_github_nailik_androidresampler_processor_OboeAudioProcessor_initProcesso
         jint targetChannelCount,
         jint targetSampleRate) {
 
-
-
     oboeResampler = MultiChannelResampler::make(
             targetChannelCount,
             sourceSampleRate,
@@ -56,7 +54,8 @@ Java_io_github_nailik_androidresampler_processor_OboeAudioProcessor_processAudio
         jobject,
         jobject jsourceBuffer,
         jint sampleCount,
-        jobject jtargetBuffer) {
+        jobject jtargetBuffer,
+        jint targetBufferCapacity) {
     if (oboeResampler != nullptr && inputChannelCount > 0 && outputChannelCount > 0) {
         auto sourceBuffer = (jbyte *) env->GetDirectBufferAddress(jsourceBuffer);
         auto targetBuffer = (jbyte *) env->GetDirectBufferAddress(jtargetBuffer);
@@ -79,8 +78,11 @@ Java_io_github_nailik_androidresampler_processor_OboeAudioProcessor_processAudio
                         value = 32767;
                     }
                     int index = framesProcessed * outputChannelCount + channel;
-                    targetBuffer[index * 2 + 0] = ((short) value) & 0xFF;
-                    targetBuffer[index * 2 + 1] = ((short) value >> 8) & 0xFF;
+                    if((index * 2 + 1) < targetBufferCapacity) {
+                        //in case estimate is false drop don't overflow buffer
+                        targetBuffer[index * 2 + 0] = ((short) value) & 0xFF;
+                        targetBuffer[index * 2 + 1] = ((short) value >> 8) & 0xFF;
+                    }
                 }
                 framesProcessed++;
             }

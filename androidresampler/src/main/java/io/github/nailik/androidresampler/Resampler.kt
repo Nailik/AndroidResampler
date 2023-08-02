@@ -12,8 +12,6 @@ class Resampler(
     private val audioProcessor = AudioProcessorFactory.createAudioProcessor(configuration)
 
     fun resample(inputData: ByteArray): ByteArray {
-
-
         return audioProcessor.processData(inputData)
     }
 

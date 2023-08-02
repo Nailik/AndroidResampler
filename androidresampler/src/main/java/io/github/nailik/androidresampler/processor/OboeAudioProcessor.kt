@@ -5,6 +5,7 @@ import io.github.nailik.androidresampler.ResamplerConfiguration
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.ceil
+import kotlin.math.min
 
 /**
  * Implementation of audio processor that uses Oboe library
@@ -32,9 +33,11 @@ internal class OboeAudioProcessor(
 
         val samplingRatio =
             configuration.outputSampleRate.toDouble() / configuration.inputSampleRate.toDouble()
-        val estimatedTargetSampleCount = ceil(sourceSampleCount * samplingRatio).toInt()
+        val estimatedTargetSampleCount = ceil(sourceSampleCount * samplingRatio)
+
+        //adding 10 percent on top in case estimate is too low
         val targetBufferCapacity =
-            estimatedTargetSampleCount * configuration.outputChannel.count * BYTES_PER_SAMPLE
+            (estimatedTargetSampleCount * configuration.outputChannel.count * BYTES_PER_SAMPLE * 1.1).toInt()
 
         val sourceBuffer = ByteBuffer.allocateDirect(sourceData.size).order(ByteOrder.LITTLE_ENDIAN)
         sourceBuffer.put(sourceData)
@@ -42,15 +45,18 @@ internal class OboeAudioProcessor(
         val targetBuffer =
             ByteBuffer.allocateDirect(targetBufferCapacity).order(ByteOrder.LITTLE_ENDIAN)
 
-        val targetSampleCount = processAudioFrame(sourceBuffer, sourceSampleCount, targetBuffer)
+        val targetSampleCount = processAudioFrame(sourceBuffer, sourceSampleCount, targetBuffer, targetBufferCapacity)
         val targetBufferSize =
             targetSampleCount * BYTES_PER_SAMPLE * configuration.outputChannel.count
 
+        //limit to resulting targetBufferSize only if it's smaller than the initial targetBufferCapacity
+        val limit = min(targetBufferSize, targetBufferCapacity)
+
         targetBuffer.rewind()
-        targetBuffer.limit(targetBufferSize)
+        targetBuffer.limit(limit)
         targetBuffer.position(0)
 
-        val targetData = ByteArray(targetBufferSize)
+        val targetData = ByteArray(limit)
         targetBuffer.get(targetData)
 
         return targetData
@@ -71,7 +77,8 @@ internal class OboeAudioProcessor(
     private external fun processAudioFrame(
         sourceBuffer: ByteBuffer,
         sampleCount: Int,
-        targetBuffer: ByteBuffer
+        targetBuffer: ByteBuffer,
+        targetBufferCapacity: Int
     ): Int
 
     private external fun releaseProcessor()
