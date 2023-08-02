@@ -15,7 +15,7 @@ mavenPublishing {
 }
 
 mavenPublishing {
-    coordinates("io.github.nailik", "androidresampler", "0.1")
+    coordinates("io.github.nailik", "androidresampler", "0.2")
 
     pom {
         name.set("androidresampler")
