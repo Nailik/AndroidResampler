@@ -1,21 +1,23 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
-    id("com.vanniktech.maven.publish") version "0.25.3"
+    alias(libs.plugins.mavenPublish)
 }
 
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.S01)
+    publishToMavenCentral()
     signAllPublications()
 }
 
 mavenPublishing {
-    coordinates("io.github.nailik", "androidresampler", "0.2")
+    coordinates("io.github.nailik", "androidresampler", "0.3")
 
     pom {
         name.set("androidresampler")
@@ -46,12 +48,17 @@ mavenPublishing {
 
 android {
     namespace = "io.github.nailik.androidresampler"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 1
+        minSdk = 21
         aarMetadata {
-            minCompileSdk = 1
+            minCompileSdk = 21
+        }
+        externalNativeBuild {
+            cmake {
+                arguments += listOf("-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
+            }
         }
     }
     buildTypes {
@@ -64,16 +71,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
+        sourceCompatibility = JavaVersion.VERSION_22
+        targetCompatibility = JavaVersion.VERSION_22
     }
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.22.1"
+            version = "4.0.3"
         }
     }
     testFixtures {
@@ -84,5 +88,11 @@ android {
             allVariants()
             withJavadocJar()
         }
+    }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_22)
     }
 }
