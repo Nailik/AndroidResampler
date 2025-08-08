@@ -22,7 +22,7 @@ mavenPublishing {
     pom {
         name.set("androidresampler")
         description.set("This is a simple Audio Resampler using Oboe Resampler in order to change Channel and SampleRate live.")
-        inceptionYear.set("2023")
+        inceptionYear.set("2025")
         url.set("https://github.com/Nailik/AndroidResampler")
         licenses {
             license {
